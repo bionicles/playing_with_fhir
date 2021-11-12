@@ -431,8 +431,7 @@ def find_worst_offenders(
 # ExplanationOfBenefit has a leaf which requires 8 operations to access
 def show_worst_offenders(worst_offenders: dict) -> None:
     version = worst_offenders["version"]
-    print(f"worst offenders in FHIR {version}")
-    print()
+    print(f"\nworst offenders in FHIR {version}\n")
     most_polymorphic = worst_offenders["most_polymorphic"]
     resource_type = most_polymorphic.resource_type
     n_shapes = len(most_polymorphic.shapes[version])
