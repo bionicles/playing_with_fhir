@@ -19,7 +19,7 @@ Array = np.ndarray
 
 # data from https://synthetichealth.github.io/synthea/
 VERSIONS = ("dstu2", "stu3", "r4")
-N_PATIENTS = 200
+N_PATIENTS = 200  # use NONE to analyze all patient bundles in each folder
 
 
 def test_get_paths():

@@ -22,13 +22,6 @@ python wrangle.py
 # analyze their polymorphism and nesting
 python fhir.py
 ```
-
-## results
-
-![Polymorphism & Nesting By Resource Type](by_resource_type.png)
-
-![Polymorphism & Nesting By Version](by_fhir_version.png)
-
 ## worst offenders in FHIR r4
 
 - the resource type with the most inconsistent data:
@@ -41,6 +34,19 @@ python fhir.py
     - ExplanationOfBenefit, which has a leaf which requires 8 operations to access
 
 - see output.txt for full results
+
+## pretty pictures
+
+![Polymorphism & Nesting By Resource Type](by_resource_type.png)
+
+![Polymorphism & Nesting By Version](by_fhir_version.png)
+
+## How do I run this on my own private data?
+
+1. Add a new subdirectory in ./data 
+1. Put your patient bundle json files in the new subdirectory
+1. Add the name of the subdirectory to the `VERSIONS` tuple at the top of `fhir.py`
+1. Re-run `python fhir.py`
 
 # License / Contributing / Links
 
