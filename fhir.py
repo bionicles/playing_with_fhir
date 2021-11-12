@@ -6,7 +6,7 @@
 
 from dataclasses import dataclass
 from itertools import chain
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 import json
 import os
 
@@ -71,7 +71,7 @@ def get_paths(
     raise TypeError(f"unsupported type: {type(item)}")
 
 
-def get_data(folder: str, n_patients: Optional[int] = N_PATIENTS) -> list[dict]:
+def get_data(folder: str, n_patients: Optional[int] = N_PATIENTS) -> List[dict]:
     "get data from a folder"
 
     data = []
@@ -84,7 +84,7 @@ def get_data(folder: str, n_patients: Optional[int] = N_PATIENTS) -> list[dict]:
     return data
 
 
-def group_by_resource_type(bundles: list[dict]) -> Dict[str, list[dict]]:
+def group_by_resource_type(bundles: List[dict]) -> Dict[str, List[dict]]:
     "group data by resource type"
 
     grouped = {}
