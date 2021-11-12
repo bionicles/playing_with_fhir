@@ -1,0 +1,300 @@
+Resource Type: Patient
+  n_patients: 100
+    dstu2: 
+      count: 100
+      n_shapes: 9
+      avg_depth: 3.9368821292775666
+      max_depth: 7
+    stu3: 
+      count: 100
+      n_shapes: 9
+      avg_depth: 4.084406821248926
+      max_depth: 7
+    r4: 
+      count: 100
+      n_shapes: 9
+      avg_depth: 4.084406821248926
+      max_depth: 7
+Resource Type: Organization
+  n_patients: 100
+    dstu2: 
+      count: 239
+      n_shapes: 2
+      avg_depth: 2.8107180570221755
+      max_depth: 4
+    stu3: 
+      count: 239
+      n_shapes: 2
+      avg_depth: 3.0630939809926083
+      max_depth: 5
+    r4: 
+      count: 239
+      n_shapes: 2
+      avg_depth: 2.940650608393345
+      max_depth: 5
+Resource Type: Practitioner
+  n_patients: 100
+    dstu2: 
+      count: 240
+      n_shapes: 1
+      avg_depth: 2.5
+      max_depth: 4
+    stu3: 
+      count: 240
+      n_shapes: 1
+      avg_depth: 2.642857142857143
+      max_depth: 4
+    r4: 
+      count: 240
+      n_shapes: 1
+      avg_depth: 2.7058823529411766
+      max_depth: 4
+Resource Type: Encounter
+  n_patients: 100
+    dstu2: 
+      count: 3159
+      n_shapes: 5
+      avg_depth: 2.8321223976526477
+      max_depth: 5
+    stu3: 
+      count: 3159
+      n_shapes: 5
+      avg_depth: 2.796322519285639
+      max_depth: 5
+    r4: 
+      count: 3159
+      n_shapes: 5
+      avg_depth: 2.774600267662182
+      max_depth: 5
+Resource Type: Condition
+  n_patients: 100
+    dstu2: 
+      count: 698
+      n_shapes: 2
+      avg_depth: 2.2396645288603847
+      max_depth: 4
+    stu3: 
+      count: 698
+      n_shapes: 2
+      avg_depth: 1.958462066598009
+      max_depth: 4
+    r4: 
+      count: 698
+      n_shapes: 2
+      avg_depth: 2.652886038480513
+      max_depth: 4
+Resource Type: Goal
+  n_patients: 100
+    dstu2: 
+      count: 242
+      n_shapes: 1
+      avg_depth: 1.0
+      max_depth: 1
+    stu3: 
+      count: 242
+      n_shapes: 1
+      avg_depth: 1.25
+      max_depth: 2
+    r4: 
+      count: 242
+      n_shapes: 1
+      avg_depth: 2.142857142857143
+      max_depth: 4
+Resource Type: CarePlan
+  n_patients: 100
+    dstu2: 
+      count: 285
+      n_shapes: 15
+      avg_depth: 4.138631937682571
+      max_depth: 7
+    stu3: 
+      count: 285
+      n_shapes: 15
+      avg_depth: 4.196467991169978
+      max_depth: 7
+    r4: 
+      count: 285
+      n_shapes: 15
+      avg_depth: 4.077623491918962
+      max_depth: 7
+Resource Type: Claim
+  n_patients: 100
+    dstu2: 
+      count: 3987
+      n_shapes: 26
+      avg_depth: 3.192155784146543
+      max_depth: 4
+    stu3: 
+      count: 3987
+      n_shapes: 48
+      avg_depth: 3.325111653435453
+      max_depth: 7
+    r4: 
+      count: 3987
+      n_shapes: 32
+      avg_depth: 3.4606840505602587
+      max_depth: 6
+Resource Type: MedicationOrder
+  n_patients: 100
+    dstu2: 
+      count: 828
+      n_shapes: 6
+      avg_depth: 2.3858142790480636
+      max_depth: 6
+Resource Type: Observation
+  n_patients: 100
+    dstu2: 
+      count: 18329
+      n_shapes: 3
+      avg_depth: 2.516774884289678
+      max_depth: 6
+    stu3: 
+      count: 18329
+      n_shapes: 3
+      avg_depth: 2.7046285124761753
+      max_depth: 6
+    r4: 
+      count: 18329
+      n_shapes: 3
+      avg_depth: 2.7046285124761753
+      max_depth: 6
+Resource Type: Procedure
+  n_patients: 100
+    dstu2: 
+      count: 2706
+      n_shapes: 2
+      avg_depth: 2.2571265678449257
+      max_depth: 4
+    stu3: 
+      count: 2706
+      n_shapes: 8
+      avg_depth: 2.4276649746192893
+      max_depth: 4
+    r4: 
+      count: 2706
+      n_shapes: 8
+      avg_depth: 2.4276649746192893
+      max_depth: 4
+Resource Type: Immunization
+  n_patients: 100
+    dstu2: 
+      count: 1418
+      n_shapes: 1
+      avg_depth: 2.0
+      max_depth: 4
+    stu3: 
+      count: 1418
+      n_shapes: 1
+      avg_depth: 2.0
+      max_depth: 4
+    r4: 
+      count: 1418
+      n_shapes: 1
+      avg_depth: 2.090909090909091
+      max_depth: 4
+Resource Type: DiagnosticReport
+  n_patients: 100
+    dstu2: 
+      count: 1288
+      n_shapes: 1
+      avg_depth: 2.4375
+      max_depth: 4
+    stu3: 
+      count: 1288
+      n_shapes: 6
+      avg_depth: 2.6334035407297773
+      max_depth: 4
+    r4: 
+      count: 1288
+      n_shapes: 6
+      avg_depth: 2.8678906610595414
+      max_depth: 5
+Resource Type: ImagingStudy
+  n_patients: 100
+    dstu2: 
+      count: 103
+      n_shapes: 40
+      avg_depth: 4.941869011681323
+      max_depth: 5
+    stu3: 
+      count: 103
+      n_shapes: 40
+      avg_depth: 4.937897316922916
+      max_depth: 5
+    r4: 
+      count: 103
+      n_shapes: 40
+      avg_depth: 5.3367373768181485
+      max_depth: 6
+Resource Type: AllergyIntolerance
+  n_patients: 100
+    dstu2: 
+      count: 50
+      n_shapes: 1
+      avg_depth: 1.9166666666666667
+      max_depth: 4
+    stu3: 
+      count: 50
+      n_shapes: 1
+      avg_depth: 1.9230769230769231
+      max_depth: 4
+    r4: 
+      count: 50
+      n_shapes: 1
+      avg_depth: 2.6
+      max_depth: 4
+Resource Type: MedicationAdministration
+  n_patients: 100
+    dstu2: 
+      count: 94
+      n_shapes: 1
+      avg_depth: 2.857142857142857
+      max_depth: 5
+    stu3: 
+      count: 94
+      n_shapes: 1
+      avg_depth: 2.272727272727273
+      max_depth: 4
+    r4: 
+      count: 94
+      n_shapes: 1
+      avg_depth: 2.272727272727273
+      max_depth: 4
+Resource Type: ExplanationOfBenefit
+  n_patients: 100
+    stu3: 
+      count: 3159
+      n_shapes: 68
+      avg_depth: 4.986913993458115
+      max_depth: 8
+    r4: 
+      count: 3159
+      n_shapes: 53
+      avg_depth: 5.078298533984896
+      max_depth: 8
+Resource Type: MedicationRequest
+  n_patients: 100
+    stu3: 
+      count: 828
+      n_shapes: 9
+      avg_depth: 2.465445067530211
+      max_depth: 7
+    r4: 
+      count: 828
+      n_shapes: 9
+      avg_depth: 2.5909056460780597
+      max_depth: 8
+Resource Type: CareTeam
+  n_patients: 100
+    r4: 
+      count: 285
+      n_shapes: 8
+      avg_depth: 4.482345643668289
+      max_depth: 7
+Resource Type: Device
+  n_patients: 100
+    r4: 
+      count: 3
+      n_shapes: 1
+      avg_depth: 2.1176470588235294
+      max_depth: 4
