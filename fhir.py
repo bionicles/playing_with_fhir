@@ -10,6 +10,8 @@ from typing import Dict, List, Optional, Tuple
 import json
 import os
 
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
 from rich import print
 import numpy as np
 
@@ -17,7 +19,7 @@ Array = np.ndarray
 
 # data from https://synthetichealth.github.io/synthea/
 VERSIONS = ("dstu2", "stu3", "r4")
-N_PATIENTS = 100
+N_PATIENTS = None
 
 
 def test_get_paths():
@@ -75,9 +77,11 @@ def get_data(folder: str, n_patients: Optional[int] = N_PATIENTS) -> List[dict]:
     "get data from a folder"
 
     data = []
-    for file in os.listdir("./data" + folder):
+    path = os.path.join("data", folder)
+    for file in os.listdir(path):
         if file.endswith(".json"):
-            with open(os.path.join(folder, file)) as f:
+            filepath = os.path.join("data", folder, file)
+            with open(filepath) as f:
                 data.append(json.load(f))
         if n_patients is not None and len(data) == n_patients:
             break
@@ -121,9 +125,9 @@ class VersionStats:
     "statistics for a FHIR version"
     version: str
     n_patients: int
-    counts: Dict[str, int]
-    depths: Dict[str, Array]
-    shapes: Dict[str, tuple]
+    counts: Dict[str, int]  # {resource_type: count}
+    depths: Dict[str, Array]  # {resource_type: leaf_depths}
+    shapes: Dict[str, tuple]  # {resource_type: (shape, ...)}
 
 
 def get_version_stats(version: str, n_patients: int = N_PATIENTS) -> Dict[str, tuple]:
@@ -163,10 +167,10 @@ class ResourceTypeStats:
     shapes: Dict[str, tuple]  # {version: shapes}
 
 
-# group the resources by type across FHIR versions
 def get_resource_stats(
     stats: Dict[str, VersionStats]  # {version: version_stats}
 ) -> Dict[str, ResourceTypeStats]:  # {resource_type: resource_type_stats}
+    "group the resources by type across FHIR versions"
     grouped = {}
     for version, version_stats in stats.items():
         for resource_type, instances in version_stats.counts.items():
@@ -187,7 +191,6 @@ def get_resource_stats(
 def show_resource_stats(stats: ResourceTypeStats) -> None:
     "renders a ResourceTypeStats to stdout"
     print(f"Resource Type: {stats.resource_type}")
-    print(f"  n_patients: {stats.n_patients}")
     for version in stats.counts.keys():
         print(f"    {version}: ")
         print(f"      count: {stats.counts[version]}")
@@ -196,11 +199,285 @@ def show_resource_stats(stats: ResourceTypeStats) -> None:
         print(f"      max_depth: {stats.depths[version].max()}")
 
 
+def plot_lines_and_violins(
+    all_version_stats: Dict[str, VersionStats],  # {version: version_stats}
+    all_resource_type_stats: Dict[
+        str, ResourceTypeStats
+    ],  # {resource_type: resource_type_stats}
+) -> go.Figure:
+    """
+    Plots 2 subfigures in 1 column
+    top row: a (version, n_shapes) line per resource type
+    top row: a (version, n_shapes) violin per version
+    bottom row: a (version, depths) violin per version
+    """
+    # make a figure with 2 rows and 1 column
+    fig = make_subplots(
+        rows=2,
+        cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.05,
+        subplot_titles=("", ""),
+    )
+    # label the figure
+    fig.update_layout(
+        title_text="Resource Polymorphism & Nesting Of FHIR Versions",
+        xaxis_title="--- FHIR Version ---> ",
+        yaxis_title="Count",
+        width=1000,
+        height=800,
+    )
+    # make the top row
+    # add a (version, n_shapes) line per resource_type
+    for resource_type, resource_type_stats in all_resource_type_stats.items():
+        fig.add_trace(
+            go.Scatter(
+                x=list(resource_type_stats.counts.keys()),
+                y=list(
+                    len(resource_type_stats.shapes[version])
+                    for version in resource_type_stats.counts.keys()
+                ),
+                mode="lines",
+                name=resource_type,
+            ),
+            row=1,
+            col=1,
+        )
+    # label the top row
+    fig.update_yaxes(
+        title_text="Polymorphism / # Unique Shapes (lower is better)", row=1, col=1
+    )
+    # add a (version, n_shapes) violin per version
+    colors = {"dstu2": "red", "stu3": "green", "r4": "blue"}
+    for version, version_stats in all_version_stats.items():
+        # group by version
+        n_shapes = list(map(len, version_stats.shapes.values()))
+        fig.add_trace(
+            go.Violin(
+                x=[version] * len(n_shapes),
+                y=n_shapes,
+                name=version,
+                marker_color=colors[version],
+                showlegend=False,
+                legendgroup=version,
+            ),
+            row=1,
+            col=1,
+        )
+    # make the bottom row
+    # add a (version, depths) violin per version
+    for version, version_stats in all_version_stats.items():
+        # group all the depths for all the resource_types of this version
+        depths = np.concatenate(
+            [
+                version_stats.depths[resource_type]
+                for resource_type in version_stats.counts.keys()
+            ]
+        )
+        fig.add_trace(
+            go.Violin(
+                x=[version] * len(depths),
+                y=depths,
+                name=version,
+                marker_color=colors[version],
+                legendgroup=version,
+            ),
+            row=2,
+            col=1,
+        )
+    # label the bottom row
+    fig.update_yaxes(title_text="Nesting / Leaf Depth (lower is better)", row=2, col=1)
+    return fig
+
+
+def plot_bars(
+    all_resource_type_stats: Dict[
+        str, ResourceTypeStats
+    ],  # {resource_type: resource_type_stats}
+) -> go.Figure:
+    """
+    Plots 2 subfigures in 1 column
+    top row: a (resource_type, n_shapes) bar group per resource_type, one bar per version
+    bottom row: a (resource_type, depths) box plot group per resource_type, one box per version
+    """
+    # make a figure with 2 rows and 1 column
+    fig = make_subplots(
+        rows=2,
+        cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.05,
+        subplot_titles=("", ""),
+    )
+    # label the figure
+    fig.update_layout(
+        title_text="Polymorphism & Nesting Of FHIR Resource Types",
+        xaxis_title="Resource Type",
+        yaxis_title="Count",
+        barmode="group",
+        width=1000,
+        height=800,
+    )
+    colors = {"dstu2": "red", "stu3": "green", "r4": "blue"}
+    # make the top row
+    # add a (resource_type, n_shapes) bar group per resource_type, one bar per version
+    for version in colors.keys():
+        x = [
+            resource_type
+            for resource_type in all_resource_type_stats.keys()
+            if version in all_resource_type_stats[resource_type].counts
+        ]
+        y = [
+            len(resource_type_stats.shapes[version])
+            for resource_type_stats in all_resource_type_stats.values()
+            if version in resource_type_stats.counts
+        ]
+        fig.add_trace(
+            go.Bar(
+                name=version,
+                x=x,
+                y=y,
+                marker_color=colors[version],
+                legendgroup=version,
+            ),
+            row=1,
+            col=1,
+        )
+    # label the top row
+    fig.update_yaxes(
+        title_text="Polymorphism / # Unique Shapes (lower is better)", row=1, col=1
+    )
+    # add a (resource_type, depths) bar group per resource_type, one box per version
+    for version in colors.keys():
+        x = [
+            resource_type
+            for resource_type in all_resource_type_stats.keys()
+            if version in all_resource_type_stats[resource_type].counts
+        ]
+        y = [
+            resource_type_stats.depths[version].mean()
+            for resource_type_stats in all_resource_type_stats.values()
+            if version in resource_type_stats.counts
+        ]
+        fig.add_trace(
+            go.Bar(
+                name=version,
+                x=x,
+                y=y,
+                marker_color=colors[version],
+                legendgroup=version,
+                showlegend=False,
+            ),
+            row=2,
+            col=1,
+        )
+    # label the bottom row
+    fig.update_yaxes(
+        title_text="Average Nesting / Leaf Depth (lower is better)", row=2, col=1
+    )
+    return fig
+
+
+def find_worst_offenders(
+    all_resource_type_stats: Dict[str, ResourceTypeStats],
+    version: str,
+) -> Dict[str, ResourceTypeStats]:
+    """
+    Finds the resource types with the worst polymorphing and nesting
+    """
+    # find the resource type with the most number of shapes
+    most_polymorphic_resource_type = None
+    deepest_resource_type_by_mean = None
+    deepest_resource_type_by_max = None
+    for resource_type, resource_type_stats in all_resource_type_stats.items():
+        if version not in resource_type_stats.counts:
+            continue
+        shapes = resource_type_stats.shapes[version]
+        depths = resource_type_stats.depths[version]
+        if most_polymorphic_resource_type is None or len(shapes) > len(
+            all_resource_type_stats[most_polymorphic_resource_type].shapes[version]
+        ):
+            most_polymorphic_resource_type = resource_type
+        if (
+            deepest_resource_type_by_mean is None
+            or depths.mean()
+            > all_resource_type_stats[deepest_resource_type_by_mean]
+            .depths[version]
+            .mean()
+        ):
+            deepest_resource_type_by_mean = resource_type
+        if (
+            deepest_resource_type_by_max is None
+            or depths.max()
+            > all_resource_type_stats[deepest_resource_type_by_max]
+            .depths[version]
+            .max()
+        ):
+            deepest_resource_type_by_max = resource_type
+    return {
+        "version": version,
+        "most_polymorphic": all_resource_type_stats[most_polymorphic_resource_type],
+        "deepest_by_mean": all_resource_type_stats[deepest_resource_type_by_mean],
+        "deepest_by_max": all_resource_type_stats[deepest_resource_type_by_max],
+    }
+
+
+# - the resource type with the most inconsistent data:
+# ImagingStudy with 177 different shapes in a sample of 977 ImagingStudy instances
+
+# - the resource type with most deeply nested data (on average):
+# ImagingStudy, which requires an average of 5.3 operations to access each leaf
+
+# - the resource type with most deeply nested data (worst case):
+# ExplanationOfBenefit has a leaf which requires 8 operations to access
+def show_worst_offenders(worst_offenders: dict) -> None:
+    version = worst_offenders["version"]
+    print(f"worst offenders in FHIR {version}")
+    print()
+    most_polymorphic = worst_offenders["most_polymorphic"]
+    resource_type = most_polymorphic.resource_type
+    n_shapes = len(most_polymorphic.shapes[version])
+    count = most_polymorphic.counts[version]
+    print("the resource type with the most inconsistent data:")
+    print(
+        f"{resource_type}, with {n_shapes} unique shapes in a sample of {count} {resource_type} instances"
+    )
+    print()
+    deepest_by_mean = worst_offenders["deepest_by_mean"]
+    resource_type = deepest_by_mean.resource_type
+    mean_depth = deepest_by_mean.depths[version].mean()
+    print("the resource type with most deeply nested data (on average):")
+    print(
+        f"{resource_type}, which requires an average of {mean_depth} operations to access each leaf"
+    )
+    print()
+    deepest_by_max = worst_offenders["deepest_by_max"]
+    resource_type = deepest_by_max.resource_type
+    max_depth = deepest_by_max.depths[version].max()
+    print("the resource type with most deeply nested data (worst case):")
+    print(
+        f"{resource_type}, which has a leaf which requires {max_depth} operations to access"
+    )
+
+
 if __name__ == "__main__":
     version_stats = {
         version: get_version_stats(version, n_patients=N_PATIENTS)
         for version in VERSIONS
     }
     resource_stats = get_resource_stats(version_stats)
-    for resource_type, resource_type_stats in resource_stats.items():
-        show_resource_stats(resource_type_stats)
+
+    # to make output.txt, uncomment this and run `python fhir.py > output.txt`
+    # for resource_type, resource_type_stats in resource_stats.items():
+    #     show_resource_stats(resource_type_stats)
+
+    # to make worst.txt, uncomment this and run `python fhir.py > worst.txt`
+    worst_offenders = find_worst_offenders(resource_stats, "r4")
+    show_worst_offenders(worst_offenders)
+
+    # to make plots, uncomment this and run `python fhir.py`
+    # warning: violin plots are slow if you have a lot of data
+    # lines_and_violins = plot_lines_and_violins(version_stats, resource_stats)
+    # lines_and_violins.write_image("by_fhir_version.png")
+    # bars = plot_bars(resource_stats)
+    # bars.show()
+    # bars.write_image("by_resource_type.png")

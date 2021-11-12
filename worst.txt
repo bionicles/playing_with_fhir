@@ -1,0 +1,10 @@
+worst offenders in FHIR r4
+
+the resource type with the most inconsistent data:
+ImagingStudy, with 177 unique shapes in a sample of 977 ImagingStudy instances
+
+the resource type with most deeply nested data (on average):
+ImagingStudy, which requires an average of 5.3384820406218125 operations to access each leaf
+
+the resource type with most deeply nested data (worst case):
+ExplanationOfBenefit, which has a leaf which requires 8 operations to access
