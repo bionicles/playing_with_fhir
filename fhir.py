@@ -19,7 +19,7 @@ Array = np.ndarray
 
 # data from https://synthetichealth.github.io/synthea/
 VERSIONS = ("dstu2", "stu3", "r4")
-N_PATIENTS = None
+N_PATIENTS = 200
 
 
 def test_get_paths():
@@ -467,8 +467,8 @@ if __name__ == "__main__":
     resource_stats = get_resource_stats(version_stats)
 
     # to make output.txt, uncomment this and run `python fhir.py > output.txt`
-    # for resource_type, resource_type_stats in resource_stats.items():
-    #     show_resource_stats(resource_type_stats)
+    for resource_type, resource_type_stats in resource_stats.items():
+        show_resource_stats(resource_type_stats)
 
     # to make worst.txt, uncomment this and run `python fhir.py > worst.txt`
     worst_offenders = find_worst_offenders(resource_stats, "r4")
@@ -476,8 +476,9 @@ if __name__ == "__main__":
 
     # to make plots, uncomment this and run `python fhir.py`
     # warning: violin plots are slow if you have a lot of data
-    # lines_and_violins = plot_lines_and_violins(version_stats, resource_stats)
+    lines_and_violins = plot_lines_and_violins(version_stats, resource_stats)
+    lines_and_violins.show()
     # lines_and_violins.write_image("by_fhir_version.png")
-    # bars = plot_bars(resource_stats)
-    # bars.show()
+    bars = plot_bars(resource_stats)
+    bars.show()
     # bars.write_image("by_resource_type.png")
